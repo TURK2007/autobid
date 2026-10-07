@@ -128,7 +128,6 @@ def sell_car(request):
             car.save()
             return redirect("/")
         else:
-            # Показывает ошибки в терминале, если какое-то поле заполнено неверно
             print("Ошибки формы:", form.errors)
     else:
         form = CarForm()
