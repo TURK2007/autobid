@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Результаты поиска</title>
+    <style>
+        body {
+            background-color: #0d0f12;
+            color: #ffffff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 40px 20px;
+        }
+
+        body.modal-open {
+            overflow: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            font-size: 28px;
+            margin: 0;
+        }
+
+        .back-btn {
+            color: #00cca3;
+            text-decoration: none;
+            font-weight: 600;
+            padding: 8px 16px;
+            border: 1px solid #00cca3;
+            border-radius: 8px;
+            transition: 0.2s;
+        }
+
+        .back-btn:hover {
+            background-color: #00cca3;
+            color: #000;
+        }
+
+        /* Сетка карточек */
+        .car-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .car-card {
+            background-color: #16181e;
+            border: 1px solid #2a2e39;
+            border-radius: 12px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            cursor: pointer;
+            transition: transform 0.2s, border-color 0.2s;
+        }
+
+        .car-card:hover {
+            transform: translateY(-4px);
+            border-color: #00cca3;
+        }
+
+        .car-image {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            background-color: #2a2e39;
+        }
+
+        .car-details {
+            padding: 16px;
+        }
+
+        .car-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-transform: capitalize;
+        }
+
+        .car-info {
+            font-size: 14px;
+            color: #8c93a2;
+            margin-bottom: 6px;
+        }
+
+        .car-price {
+            font-size: 20px;
+            font-weight: bold;
+            color: #00cca3;
+            margin-top: 12px;
+        }
+
+        .no-results {
+            color: #8c93a2;
+            font-size: 18px;
+            margin-top: 20px;
+        }
+
+        /* Стили модального окна */
+        .car-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+            z-index: 1000;
+        }
+
+        .car-modal.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .car-modal-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(4px);
+        }
+
+        .car-modal-window {
+            position: relative;
+            background-color: #16181e;
+            border: 1px solid #2a2e39;
+            border-radius: 16px;
+            max-width: 800px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: row;
+            gap: 20px;
+            padding: 24px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            z-index: 1001;
+        }
+
+        @media (max-width: 768px) {
+            .car-modal-window {
+                flex-direction: column;
+            }
+        }
+
+        .car-modal-close {
+            position: absolute;
+            top: 12px;
+            right: 16px;
+            background: none;
+            border: none;
+            color: #8c93a2;
+            font-size: 28px;
+            cursor: pointer;
+            line-height: 1;
+        }
+
+        .car-modal-close:hover {
+            color: #ffffff;
+        }
+
+        .car-modal-image {
+            flex: 1;
+            min-width: 250px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .car-modal-image img {
+            width: 100%;
+            border-radius: 10px;
+            object-fit: cover;
+            max-height: 300px;
+        }
+
+        .car-modal-info {
+            flex: 1.2;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .section-label {
+            color: #00cca3;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        .car-modal-info h2 {
+            margin: 0 0 16px 0;
+            font-size: 24px;
+        }
+
+        .modal-car-details {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            background: #0d0f12;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+        }
+
+        .modal-car-details small {
+            display: block;
+            color: #8c93a2;
+            font-size: 12px;
+        }
+
+        .modal-car-details strong {
+            font-size: 15px;
+        }
+
+        .modal-price {
+            margin-bottom: 16px;
+        }
+
+        .modal-price small {
+            display: block;
+            color: #8c93a2;
+            font-size: 12px;
+        }
+
+        .modal-price strong {
+            font-size: 24px;
+            color: #00cca3;
+        }
+
+        #modalCarDescription {
+            color: #b3b9c5;
+            font-size: 14px;
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+
+        .bid-btn {
+            background-color: #00cca3;
+            color: #000000;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: auto;
+            transition: background-color 0.2s;
+        }
+
+        .bid-btn:hover {
+            background-color: #00b38f;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1>Результаты поиска</h1>
+        <a href="/" class="back-btn">← На главную</a>
+    </div>
+
+    {% if cars %}
+        <div class="car-grid">
+            {% for car in cars %}
+                <div class="car-card" onclick="openCarModal('{{ car.id }}')">
+                    {% if car.image %}
+                        <img src="{{ car.image.url }}" alt="{{ car.brand }}" class="car-image">
+                    {% else %}
+                        <div class="car-image" style="display:flex; align-items:center; justify-content:center; color:#8c93a2;">Нет фото</div>
+                    {% endif %}
+
+                    <div class="car-details">
+                        <div class="car-title">{{ car.brand }} {{ car.model }}</div>
+                        <div class="car-info">Год: {{ car.year }}</div>
+                        {% if car.mileage %}
+                            <div class="car-info">Пробег: {{ car.mileage }} км</div>
+                        {% endif %}
+                        {% if car.fuel %}
+                            <div class="car-info">Топливо: {{ car.fuel }}</div>
+                        {% endif %}
+                        <div class="car-price">${{ car.price }}</div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="no-results">По вашему запросу ничего не найдено.</p>
+    {% endif %}
+</div>
+
+
+<div id="carModal" class="car-modal">
+    <div class="car-modal-overlay" onclick="closeCarModal()"></div>
+    <div class="car-modal-window">
+        <button class="car-modal-close" onclick="closeCarModal()">&times;</button>
+        <div class="car-modal-image">
+            <img id="modalCarImage" src="" alt="Автомобиль">
+        </div>
+        <div class="car-modal-info">
+            <span class="section-label">АУКЦИОН</span>
+            <h2 id="modalCarTitle"></h2>
+            <div class="modal-car-details">
+                <div>
+                    <small>Год</small>
+                    <strong id="modalCarYear"></strong>
+                </div>
+                <div>
+                    <small>Пробег</small>
+                    <strong id="modalCarMileage"></strong>
+                </div>
+                <div>
+                    <small>Топливо</small>
+                    <strong id="modalCarFuel"></strong>
+                </div>
+            </div>
+            <div class="modal-price">
+                <small>Текущая цена</small>
+                <strong id="modalCarPrice"></strong>
+            </div>
+            <p id="modalCarDescription"></p>
+            <button class="bid-btn">Сделать ставку →</button>
+        </div>
+    </div>
+</div>
+
+<script>
+const cars = {
+    {% for car in cars %}
+    "{{ car.id }}": {
+        title: "{{ car.brand|escapejs }} {{ car.model|escapejs }}",
+        image: "{% if car.image %}{{ car.image.url|escapejs }}{% endif %}",
+        year: "{{ car.year }}",
+        mileage: "{{ car.mileage }}",
+        fuel: "{{ car.fuel|escapejs }}",
+        price: "{{ car.price }}",
+        description: "{{ car.description|escapejs }}"
+    },
+    {% endfor %}
+};
+
+function openCarModal(id) {
+    const car = cars[id];
+    if (!car) return;
+
+    document.getElementById("modalCarTitle").textContent = car.title;
+    document.getElementById("modalCarYear").textContent = car.year;
+    document.getElementById("modalCarMileage").textContent = car.mileage ? car.mileage + " км" : "—";
+    document.getElementById("modalCarFuel").textContent = car.fuel || "—";
+    document.getElementById("modalCarPrice").textContent = "$" + car.price;
+    document.getElementById("modalCarDescription").textContent = car.description || "Описание автомобиля отсутствует.";
+
+    const image = document.getElementById("modalCarImage");
+    if (car.image) {
+        image.src = car.image;
+        image.style.display = "block";
+    } else {
+        image.style.display = "none";
+    }
+
+    document.getElementById("carModal").classList.add("active");
+    document.body.classList.add("modal-open");
+}
+
+function closeCarModal() {
+    document.getElementById("carModal").classList.remove("active");
+    document.body.classList.remove("modal-open");
+}
+</script>
+
+</body>
+</html>

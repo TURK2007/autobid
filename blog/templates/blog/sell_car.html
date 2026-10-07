@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>AutoBid — Продать автомобиль</title>
+
+  <style>
+    body {
+      background-color: #0b0f12 !important;
+      color: #ffffff !important;
+      font-family: system-ui, -apple-system, sans-serif;
+      margin: 0;
+      padding: 20px;
+    }
+
+    .form-container {
+      max-width: 600px;
+      margin: 40px auto;
+      padding: 32px;
+      background-color: #161b22;
+      border: 1px solid #30363d;
+      border-radius: 12px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+    }
+
+    .form-container h2 {
+      margin-top: 0;
+      font-size: 26px;
+      color: #ffffff;
+    }
+
+    .subtitle {
+      color: #8b949e;
+      margin-bottom: 24px;
+      font-size: 14px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .form-group.full-width {
+      margin-bottom: 16px;
+    }
+
+    .form-group label {
+      font-size: 13px;
+      font-weight: 600;
+      color: #c9d1d9;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    select,
+    textarea {
+      width: 100%;
+      padding: 10px 12px;
+      background-color: #0d1117;
+      border: 1px solid #30363d;
+      border-radius: 6px;
+      color: #f0f6fc;
+      font-size: 14px;
+      box-sizing: border-box;
+      outline: none;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: #00bba7;
+      box-shadow: 0 0 0 2px rgba(0, 187, 167, 0.25);
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 90px;
+    }
+
+    .submit-btn {
+      width: 100%;
+      padding: 12px;
+      background-color: #00bba7;
+      color: #0d1117;
+      border: none;
+      border-radius: 6px;
+      font-weight: 700;
+      font-size: 15px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+
+    .submit-btn:hover {
+      background-color: #00d4bd;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="form-container">
+    <h2>Продать автомобиль</h2>
+    <p class="subtitle">Заполните информацию об автомобиле и добавьте фотографию.</p>
+
+
+    <form method="POST" enctype="multipart/form-data">
+      {% csrf_token %}
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Brand</label>
+          <input type="text" name="brand" placeholder="Например: BMW" required />
+        </div>
+        <div class="form-group">
+          <label>Model</label>
+          <input type="text" name="model" placeholder="Например: X5" required />
+        </div>
+        <div class="form-group">
+          <label>Year</label>
+          <input type="number" name="year" placeholder="2020" required />
+        </div>
+        <div class="form-group">
+          <label>Mileage</label>
+          <input type="text" name="mileage" placeholder="50 000 км" required />
+        </div>
+        <div class="form-group">
+          <label>Fuel</label>
+          <select name="fuel" required>
+            <option value="">Выберите тип топлива</option>
+            <option value="petrol">Бензин</option>
+            <option value="diesel">Дизель</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Price ($)</label>
+          <input type="number" name="price" placeholder="25 000" required />
+        </div>
+      </div>
+
+      <div class="form-group full-width">
+        <label>Description</label>
+        <textarea name="description" placeholder="Опишите состояние..."></textarea>
+      </div>
+
+      <div class="form-group full-width">
+        <label>Image</label>
+        <input type="file" name="image" />
+      </div>
+
+      <button type="submit" class="submit-btn">Опубликовать автомобиль</button>
+    </form>
+  </div>
+
+</body>
+</html>

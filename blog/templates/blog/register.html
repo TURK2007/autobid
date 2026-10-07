@@ -1,0 +1,200 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Регистрация — AutoBid</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: radial-gradient(circle at 50% 20%, #1e2638 0%, #0d1117 100%);
+      color: #ffffff;
+      padding: 20px 0;
+    }
+
+    /* Карточка регистрации */
+    .register-card {
+      width: 100%;
+      max-width: 440px;
+      padding: 40px 32px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 16px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(12px);
+    }
+
+    .logo {
+      font-size: 28px;
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 8px;
+    }
+
+    .logo span {
+      color: #00d2b5;
+    }
+
+    h2 {
+      font-size: 15px;
+      font-weight: 400;
+      text-align: center;
+      color: #94a3b8;
+      margin-bottom: 24px;
+    }
+
+    /* Сообщения об ошибках */
+    .error-message {
+      background: rgba(239, 68, 68, 0.15);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      color: #f87171;
+      padding: 10px;
+      border-radius: 8px;
+      font-size: 13px;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    /* Блоки полей ввода */
+    .input-group {
+      margin-bottom: 18px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .input-group label {
+      font-size: 13px;
+      font-weight: 500;
+      color: #cbd5e1;
+      margin-bottom: 6px;
+    }
+
+    .input-group input {
+      width: 100%;
+      padding: 12px 16px;
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      color: #ffffff;
+      font-size: 14px;
+      outline: none;
+      transition: all 0.2s ease;
+    }
+
+    .input-group input:focus {
+      border-color: #00d2b5;
+      box-shadow: 0 0 0 3px rgba(0, 210, 181, 0.15);
+    }
+
+    /* Подсказки Django под полями */
+    .help-text {
+      font-size: 11px;
+      color: #64748b;
+      margin-top: 5px;
+      line-height: 1.3;
+    }
+
+    /* Кнопка регистрации */
+    .btn-submit {
+      width: 100%;
+      padding: 12px;
+      margin-top: 10px;
+      background: #00d2b5;
+      color: #0f172a;
+      border: none;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s ease, transform 0.1s ease;
+    }
+
+    .btn-submit:hover {
+      background: #00b89f;
+    }
+
+    .btn-submit:active {
+      transform: scale(0.98);
+    }
+
+    /* Ссылка на вход */
+    .card-footer {
+      margin-top: 24px;
+      text-align: center;
+      font-size: 14px;
+      color: #94a3b8;
+    }
+
+    .card-footer a {
+      color: #00d2b5;
+      text-decoration: none;
+      font-weight: 500;
+      margin-left: 4px;
+    }
+
+    .card-footer a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="register-card">
+    <div class="logo">
+      <span>Auto</span>Bid
+    </div>
+    <h2>Создание аккаунта</h2>
+
+    {% if form.errors %}
+      <div class="error-message">
+        Пожалуйста, исправьте ошибки в форме.
+      </div>
+    {% endif %}
+
+    <form method="post">
+      {% csrf_token %}
+
+      <div class="input-group">
+        <label for="id_username">Логин (Username)</label>
+        <input type="text" id="id_username" name="username" placeholder="Придумайте логин" required autocomplete="off">
+      </div>
+
+      <div class="input-group">
+        <label for="id_email">Email</label>
+        <input type="email" id="id_email" name="email" placeholder="example@mail.com" required>
+      </div>
+
+      <div class="input-group">
+        <label for="id_password1">Пароль</label>
+        <input type="password" id="id_password1" name="password1" placeholder="Не менее 8 символов" required>
+      </div>
+
+      <div class="input-group">
+        <label for="id_password2">Подтверждение пароля</label>
+        <input type="password" id="id_password2" name="password2" placeholder="Повторите пароль" required>
+      </div>
+
+      <button type="submit" class="btn-submit">Зарегистрироваться</button>
+    </form>
+
+    <div class="card-footer">
+      <span>Уже есть аккаунт?</span>
+      <a href="{% url 'login' %}">Войти</a>
+    </div>
+  </div>
+
+</body>
+</html>

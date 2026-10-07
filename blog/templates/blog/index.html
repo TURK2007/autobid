@@ -1,0 +1,329 @@
+﻿{% load static %}
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AutoBid — Автомобили</title>
+    <link rel="stylesheet" href="{% static 'blog/style.css' %}">
+</head>
+
+<body>
+
+<header class="header">
+    <div class="container header-inner">
+        <a href="/" class="logo">
+            <span class="logo-icon">A</span>
+            <span>Auto<span>Bid</span></span>
+        </a>
+
+        <nav class="nav">
+            <a href="#cars">Автомобили</a>
+            <a href="#auctions">Аукционы</a>
+            <a href="#about">О нас</a>
+        </nav>
+
+        <div class="header-actions">
+            {% if user.is_authenticated %}
+                <span class="username">{{ user.username }}</span>
+                <a href="{% url 'logout' %}" class="login-btn">Выйти</a>
+                <a href="{% url 'sell_car' %}" class="sell-btn">Продать авто</a>
+            {% else %}
+                <a href="{% url 'login' %}" class="login-btn">Войти</a>
+                <a href="{% url 'register' %}" class="sell-btn">Регистрация</a>
+            {% endif %}
+        </div>
+    </div>
+</header>
+
+<main>
+    <section class="hero">
+        <div class="container hero-content">
+            <div class="hero-text">
+                <div class="badge">
+                    <span></span> Онлайн-аукцион автомобилей
+                </div>
+
+                <h1>
+                    Найди автомобиль, 
+                    <strong>который стоит своих денег</strong>
+                </h1>
+
+                <p>
+                    Покупай автомобили на аукционах напрямую.
+                    Прозрачные ставки, проверенные машины и лучшие цены.
+                </p>
+
+                <div class="hero-buttons">
+                    <a href="#cars" class="primary-btn">
+                        Смотреть автомобили <span>→</span>
+                    </a>
+                    <a href="#auctions" class="secondary-btn">
+                        Как это работает
+                    </a>
+                </div>
+
+                <div class="stats">
+                    <div class="stat">
+                        <strong>12 500+</strong>
+                        <span>автомобилей</span>
+                    </div>
+                    <div class="stat">
+                        <strong>3 200+</strong>
+                        <span>покупателей</span>
+                    </div>
+                    <div class="stat">
+                        <strong>98%</strong>
+                        <span>довольных клиентов</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="hero-car">
+                <div class="car-glow"></div>
+                <div class="car-card">
+                    <div class="car-card-top">
+                        <span class="live"><i></i> LIVE</span>
+                        <span>Аукцион #2841</span>
+                    </div>
+                    <div class="car-image">🚘</div>
+                    <div class="car-info">
+                        <div>
+                            <h3>BMW M4 Competition</h3>
+                            <p>2023 · 18 420 км · Бензин</p>
+                        </div>
+                        <div class="price">
+                            <small>Текущая ставка</small>
+                            <strong>$48 500</strong>
+                        </div>
+                    </div>
+                    <button class="bid-btn">Сделать ставку →</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+{% comment %} поескавая система {% endcomment %}
+<section class="search-section">
+    <div class="container">
+            <form class="search-box" action="/search/" method="GET">
+            <div class="search-field">
+                <label for="car-title">Название авто</label>
+                <input type="text" id="car-title" name="q" placeholder="Например: BMW M4 или Camry" />
+            </div>
+
+            <div class="search-field">
+                <label for="car-year">Год</label>
+                <input type="number" id="car-year" name="year" placeholder="2020" min="1900" max="2026" />
+            </div>
+
+            <div class="search-field">
+                <label for="price-from">Цена от ($)</label>
+                <input type="number" id="price-from" name="price_min" placeholder="От" min="0" />
+            </div>
+
+            <div class="search-field">
+                <label for="price-to">Цена до ($)</label>
+                <input type="number" id="price-to" name="price_max" placeholder="До" min="0" />
+            </div>
+
+            <button type="submit" class="search-btn">🔍 Найти автомобиль</button>
+        </form>
+    </div>
+</section>
+ <style>
+  .car-photo {
+      position: relative !important;
+      width: 100% !important;
+      height: 200px !important; /* Напрямую задаем высоту */
+      background: #1a202c !important;
+      overflow: hidden !important;
+  }
+
+  .car-photo img {
+      width: 100% !important;
+      height: 100% !important;
+      object-fit: cover !important; /* Принудительно обрезаем изображение */
+  }
+
+  .car-item-content {
+      padding: 16px !important;
+      background: #12161f !important;
+  }
+</style>
+
+<section class="cars-section" id="cars">
+    <div class="container">
+        <div class="section-heading">
+            <div>
+                <span class="section-label">ПОПУЛЯРНЫЕ АВТО</span>
+                <h2>Автомобили на аукционе</h2>
+            </div>
+            <a href="#" class="view-all">Смотреть все →</a>
+        </div>
+
+        <div class="cars-grid">
+            {% for car in cars %}
+            <article class="car-item" onclick="openCarModal('{{ car.id }}')">
+                <div class="car-photo">
+                    <span class="auction-tag">АУКЦИОН</span>
+                    {% if car.image %}
+                        <img src="{{ car.image.url }}" alt="{{ car.brand }} {{ car.model }}">
+                    {% else %}
+                        <div class="fake-car">🚗</div>
+                    {% endif %}
+                </div>
+                <div class="car-item-content">
+                    <div class="car-title">
+                        <div>
+                            <h3>{{ car.brand }} {{ car.model }}</h3>
+                            <p>{{ car.year }} · {{ car.mileage }} км · {{ car.fuel }}</p>
+                        </div>
+                        <span class="heart">♡</span>
+                    </div>
+                    <div class="car-bottom">
+                        <div>
+                            <small>Текущая цена</small>
+                            <strong>${{ car.price }}</strong>
+                        </div>
+                        <span class="time">LIVE</span>
+                    </div>
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+ 
+
+    <section class="how" id="auctions">
+        <div class="container">
+            <div class="section-heading centered">
+                <div>
+                    <span class="section-label">ПРОСТО И ПОНЯТНО</span>
+                    <h2>Как работает AutoBid</h2>
+                </div>
+            </div>
+            <div class="steps">
+                <div class="step">
+                    <div class="step-number">01</div>
+                    <h3>Выберите автомобиль</h3>
+                    <p>Найдите подходящий автомобиль среди тысяч предложений.</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">02</div>
+                    <h3>Сделайте ставку</h3>
+                    <p>Участвуйте в аукционе и предложите свою цену.</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">03</div>
+                    <h3>Получите автомобиль</h3>
+                    <p>После победы оформите сделку и получите свой автомобиль.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="about" id="about">
+        <div class="container about-box">
+            <div>
+                <span class="section-label">AUTOBID</span>
+                <h2>Автомобиль мечты <span>ближе, чем кажется.</span></h2>
+            </div>
+            <p>Мы создаём современную площадку для покупки автомобилей через онлайн-аукционы.</p>
+        </div>
+    </section>
+</main>
+
+<footer class="footer">
+    <div class="container footer-inner">
+        <div class="logo">
+            <span class="logo-icon">A</span>
+            <span>Auto<span>Bid</span></span>
+        </div>
+        <p>© 2026 AutoBid. Все права защищены.</p>
+    </div>
+</footer>
+
+<!--  ОКНА -->
+<div id="carModal" class="car-modal">
+    <div class="car-modal-overlay" onclick="closeCarModal()"></div>
+    <div class="car-modal-window">
+        <button class="car-modal-close" onclick="closeCarModal()">&times;</button>
+        <div class="car-modal-image">
+            <img id="modalCarImage" src="" alt="Автомобиль">
+        </div>
+        <div class="car-modal-info">
+            <span class="section-label">АУКЦИОН</span>
+            <h2 id="modalCarTitle"></h2>
+            <div class="modal-car-details">
+                <div>
+                    <small>Год</small>
+                    <strong id="modalCarYear"></strong>
+                </div>
+                <div>
+                    <small>Пробег</small>
+                    <strong id="modalCarMileage"></strong>
+                </div>
+                <div>
+                    <small>Топливо</small>
+                    <strong id="modalCarFuel"></strong>
+                </div>
+            </div>
+            <div class="modal-price">
+                <small>Текущая цена</small>
+                <strong id="modalCarPrice"></strong>
+            </div>
+            <p id="modalCarDescription"></p>
+            <button class="bid-btn">Сделать ставку →</button>
+        </div>
+    </div>
+</div>
+
+<script>
+const cars = {
+    {% for car in cars %}
+    "{{ car.id }}": {
+        title: "{{ car.brand|escapejs }} {{ car.model|escapejs }}",
+        image: "{% if car.image %}{{ car.image.url|escapejs }}{% endif %}",
+        year: "{{ car.year }}",
+        mileage: "{{ car.mileage }}",
+        fuel: "{{ car.fuel|escapejs }}",
+        price: "{{ car.price }}",
+        description: "{{ car.description|escapejs }}"
+    },
+    {% endfor %}
+};
+
+function openCarModal(id) {
+    const car = cars[id];
+    if (!car) return;
+
+    document.getElementById("modalCarTitle").textContent = car.title;
+    document.getElementById("modalCarYear").textContent = car.year;
+    document.getElementById("modalCarMileage").textContent = car.mileage + " км";
+    document.getElementById("modalCarFuel").textContent = car.fuel;
+    document.getElementById("modalCarPrice").textContent = "$" + car.price;
+    document.getElementById("modalCarDescription").textContent = car.description || "Описание автомобиля отсутствует.";
+
+    const image = document.getElementById("modalCarImage");
+    if (car.image) {
+        image.src = car.image;
+        image.style.display = "block";
+    } else {
+        image.style.display = "none";
+    }
+
+    document.getElementById("carModal").classList.add("active");
+    document.body.classList.add("modal-open");
+}
+
+function closeCarModal() {
+    document.getElementById("carModal").classList.remove("active");
+    document.body.classList.remove("modal-open");
+}
+</script>
+
+</body>
+</html>
